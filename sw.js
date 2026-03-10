@@ -1,6 +1,6 @@
 // 獨立前綴名稱，確保不同 App 不互相干擾
 const CACHE_PREFIX = 'team-kao-golf-cache-';
-const CACHE_VERSION = 'v1.0.1';
+const CACHE_VERSION = 'v1.0.2';
 const CACHE_NAME = CACHE_PREFIX + CACHE_VERSION;
 
 // 需要快取的靜態核心檔案
