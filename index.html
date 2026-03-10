@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>高聯隊⛳</title>
+  
+  <meta property="og:title" content="高聯隊⛳">
+  <meta property="og:description" content="您的專屬高爾夫球隊管理系統">
+  <meta property="og:image" content="./icon.png">
+  <meta property="og:type" content="website">
+  
+  <link rel="manifest" href="./manifest.json">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="theme-color" content="#000000">
+  <link rel="apple-touch-icon" href="./icon.png">
+
+  <style>
+    /* 全螢幕與防裁切核心設定 */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body, html {
+      width: 100%;
+      /* 雙重高度設定，支援新舊瀏覽器與動態列 */
+      height: 100vh;
+      height: 100dvh;
+      background-color: #000000;
+      overflow: hidden;
+    }
+    
+    /* Iframe 滿版並避開瀏海/動態島與底部橫條 */
+    #gas-frame {
+      width: 100%;
+      height: 100%;
+      border: none;
+      display: block;
+      /* 安全區域 padding，完美相容 iOS/Android */
+      padding-top: env(safe-area-inset-top);
+      padding-bottom: env(safe-area-inset-bottom);
+      padding-left: env(safe-area-inset-left);
+      padding-right: env(safe-area-inset-right);
+    }
+
+    /* 過場動畫 (Splash Screen) */
+    #splash-screen {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: #000000;
+      color: #ffffff;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+      transition: opacity 0.5s ease-out;
+    }
+    
+    .spinner {
+      width: 50px;
+      height: 50px;
+      border: 5px solid rgba(255, 255, 255, 0.3);
+      border-top-color: #ffffff;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin-bottom: 20px;
+    }
+    
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    
+    #quote-text {
+      font-size: 1.1rem;
+      font-weight: bold;
+      letter-spacing: 1px;
+      text-align: center;
+      padding: 0 20px;
+      color: #e0e0e0;
+    }
+  </style>
+</head>
+<body>
+
+  <div id="splash-screen">
+    <div class="spinner"></div>
+    <div id="quote-text">系統載入中...</div>
+  </div>
+
+  <iframe 
+    id="gas-frame" 
+    src="https://script.google.com/macros/s/AKfycby-gCc0iQhK9VWmYDOI-T_2mR-1uGoEPn9n-OsMsPWhxW9w0dHBhoInYXO6p5rjiyQz/exec">
+  </iframe>
+
+  <script>
+    // 隨機激勵語錄陣列 (可自行擴充)
+    const quotes = [
+      "揮出完美的一桿！🏌️",
+      "高爾夫，是與自己的比賽。",
+      "專注當下，享受果嶺的陽光 ☀️",
+      "不怕沙坑，因為我們具備脫困的實力！",
+      "每一次揮桿，都是全新的開始⛳",
+      "高聯隊，榮耀啟航！"
+    ];
+
+    // 利用 Date.now() 進行洗牌並隨機挑選
+    function getRandomQuote() {
+      const seed = Date.now();
+      const randomIndex = seed % quotes.length;
+      return quotes[randomIndex];
+    }
+
+    // 初始化設定語錄
+    document.getElementById('quote-text').innerText = getRandomQuote();
+
+    // 處理過場動畫消失邏輯
+    const splashScreen = document.getElementById('splash-screen');
+    const iframe = document.getElementById('gas-frame');
+    
+    // 設定最少顯示時間 (1.5秒) 與記錄開始時間
+    const MIN_SPLASH_TIME = 1500; 
+    const startTime = Date.now();
+
+    function hideSplashScreen() {
+      const elapsedTime = Date.now() - startTime;
+      const remainingTime = Math.max(0, MIN_SPLASH_TIME - elapsedTime);
+
+      setTimeout(() => {
+        splashScreen.style.opacity = '0';
+        setTimeout(() => {
+          splashScreen.style.display = 'none';
+        }, 500); // 等待 CSS 淡出過場完畢
+      }, remainingTime);
+    }
+
+    // 當 GAS iframe 載入完成時觸發隱藏
+    iframe.onload = hideSplashScreen;
+
+    // Service Worker 註冊邏輯
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js')
+          .then(registration => {
+            console.log('ServiceWorker 註冊成功，範圍:', registration.scope);
+          })
+          .catch(err => {
+            console.log('ServiceWorker 註冊失敗:', err);
+          });
+      });
+    }
+  </script>
+</body>
+</html>
