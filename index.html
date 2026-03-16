@@ -130,15 +130,16 @@
       return quotes[randomIndex];
     }
 
-    // 初始化設定語錄
-    document.getElementById('quote-text').innerText = getRandomQuote();
+    // 初始化設定語錄，並將選中的語錄存起來
+    const selectedQuote = getRandomQuote();
+    document.getElementById('quote-text').innerText = selectedQuote;
 
     // 處理過場動畫消失邏輯
     const splashScreen = document.getElementById('splash-screen');
     const iframe = document.getElementById('gas-frame');
     
-    // 設定最少顯示時間 (1.5秒) 與記錄開始時間
-    const MIN_SPLASH_TIME = 1500; 
+    // 💡 動態計算最少顯示時間：基礎 1.5 秒 + (語錄字數 * 0.15 秒)
+    const MIN_SPLASH_TIME = 1500 + (selectedQuote.length * 150); 
     const startTime = Date.now();
 
     function hideSplashScreen() {
